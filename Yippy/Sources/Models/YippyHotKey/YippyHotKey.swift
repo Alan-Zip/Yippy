@@ -10,7 +10,7 @@ import Foundation
 import Cocoa
 import HotKey
 
-class YippyHotKey {
+class YippyHotKey: @unchecked Sendable {
     
     // MARK: - Types
     

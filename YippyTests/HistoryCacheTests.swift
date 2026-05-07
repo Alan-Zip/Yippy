@@ -155,6 +155,7 @@ class HistoryCacheTests: XCTestCase {
     
     
     // MARK: - unregisterItem()
+    @MainActor
     func testUnregisterItem() {
         // 1. Set up mock to return data
         let data = Data(repeating: 0, count: 1)
@@ -192,6 +193,7 @@ class HistoryCacheTests: XCTestCase {
     
     
     // MARK: - isItemRegistered()
+    @MainActor
     func testIsItemRegsitered() {
         // 1. Create an id, should initially be unregisted
         let id = UUID()
@@ -199,20 +201,10 @@ class HistoryCacheTests: XCTestCase {
         
         // 2. Register the id
         cache.registerItem(withId: id)
+        XCTAssertTrue(cache.isItemRegistered(id))
         
-        // Wait for confirmation it is registered. Then unregister the item
-        self.expectation(for: NSPredicate(block: { (_,_) -> Bool in
-            return self.cache.isItemRegistered(id)
-        }), evaluatedWith: nil) { () -> Bool in
-            self.cache.unregisterItem(withId: id)
-            return true
-        }
-        
-        // Wait for confirmation the item is unregistered.
-        self.expectation(for: NSPredicate(block: { (_,_) -> Bool in
-            return !self.cache.isItemRegistered(id)
-        }), evaluatedWith: nil, handler: nil)
-        
-        waitForExpectations(timeout: 2, handler: nil)
+        // 3. Unregister the id
+        cache.unregisterItem(withId: id)
+        XCTAssertFalse(cache.isItemRegistered(id))
     }
 }

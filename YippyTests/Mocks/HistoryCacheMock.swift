@@ -9,7 +9,7 @@
 import XCTest
 @testable import Yippy
 
-class HistoryCacheMock: HistoryCache {
+class HistoryCacheMock: HistoryCache, @unchecked Sendable {
     
     var data: Data?
     

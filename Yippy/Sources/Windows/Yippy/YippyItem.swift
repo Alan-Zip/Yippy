@@ -9,6 +9,7 @@
 import Foundation
 import Cocoa
 
+@MainActor
 protocol YippyItem {
     
     static var identifier: NSUserInterfaceItemIdentifier { get }

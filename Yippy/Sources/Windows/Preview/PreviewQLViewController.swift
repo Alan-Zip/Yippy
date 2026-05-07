@@ -54,7 +54,7 @@ class PreviewQLViewController: NSViewController, PreviewViewController {
     }
 }
 
-extension PreviewQLViewController: QLPreviewPanelDelegate, QLPreviewPanelDataSource {
+extension PreviewQLViewController: QLPreviewPanelDelegate, @preconcurrency QLPreviewPanelDataSource {
 
     func numberOfPreviewItems(in panel: QLPreviewPanel!) -> Int {
         return 1
@@ -66,8 +66,10 @@ extension PreviewQLViewController: QLPreviewPanelDelegate, QLPreviewPanelDataSou
     }
     
     override func beginPreviewPanelControl(_ panel: QLPreviewPanel!) {
-        panel.delegate = self
-        panel.dataSource = self
+        MainActor.assumeIsolated {
+            panel.delegate = self
+            panel.dataSource = self
+        }
     }
     
     override func acceptsPreviewPanelControl(_ panel: QLPreviewPanel!) -> Bool {

@@ -9,7 +9,7 @@
 import XCTest
 @testable import Yippy
 
-class WarningLoggerMock: WarningLogger {
+class WarningLoggerMock: WarningLogger, @unchecked Sendable {
     
     var expectation: XCTestExpectation!
     

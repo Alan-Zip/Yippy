@@ -9,6 +9,7 @@
 import Foundation
 import Cocoa
 
+@MainActor
 struct HistoryItemText {
     
     static let itemStringAttributes: [NSAttributedString.Key: Any] = [

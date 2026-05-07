@@ -8,6 +8,7 @@
 
 import Foundation
 
+@MainActor
 protocol YippyTableViewDelegate {
     
     func yippyTableView(_ yippyTableView: YippyTableView, selectedDidChange selected: Int?)

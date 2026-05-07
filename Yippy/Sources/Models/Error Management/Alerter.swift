@@ -9,12 +9,12 @@
 import Foundation
 import Cocoa
 
-class Alerter {
+class Alerter: @unchecked Sendable {
     
-    static var general = Alerter()
+    static let general = Alerter()
     
-    func show(_ alertable: Alertable) {
-        DispatchQueue.main.async {
+    func show(_ alertable: any Alertable) {
+        Task { @MainActor in
             alertable.createAlert().runModal()
         }
     }

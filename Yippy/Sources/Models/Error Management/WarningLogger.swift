@@ -8,7 +8,7 @@
 
 import Foundation
 
-class WarningLogger: Logger {
+class WarningLogger: Logger, @unchecked Sendable {
     
     static let general = WarningLogger(url: Constants.urls.warningLog)
 }

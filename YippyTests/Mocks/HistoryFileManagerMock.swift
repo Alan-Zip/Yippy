@@ -9,7 +9,7 @@
 import XCTest
 @testable import Yippy
 
-class HistoryFileManagerMock: HistoryFileManager {
+class HistoryFileManagerMock: HistoryFileManager, @unchecked Sendable {
     
     var dataCallCount = 0
     var data = [UUID: [NSPasteboard.PasteboardType: Data]]()

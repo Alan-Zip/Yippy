@@ -9,8 +9,9 @@
 import Foundation
 import Cocoa
 
-protocol Alertable {
+protocol Alertable: Sendable {
     
+    @MainActor
     func createAlert() -> NSAlert
     
     func show(with alerter: Alerter)

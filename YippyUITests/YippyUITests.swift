@@ -9,9 +9,10 @@
 import XCTest
 import HotKey
 
+@MainActor
 class YippyUITests: XCTestCase {
 
-    var app: XCUIApplication!
+    nonisolated(unsafe) var app: XCUIApplication!
     
     override func setUp() {
         // Nothing to clean up after a failure
@@ -21,13 +22,16 @@ class YippyUITests: XCTestCase {
         AccessControlMock.setControlGranted(true)
         
         // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
-        app = XCUIApplication()
-        app.launchArguments.append("--uitesting")
-        app.launchEnvironment["SRCROOT"] = ProcessInfo.processInfo.environment["SRCROOT"]
+        app = MainActor.assumeIsolated {
+            let app = XCUIApplication()
+            app.launchArguments.append("--uitesting")
+            app.launchEnvironment["SRCROOT"] = ProcessInfo.processInfo.environment["SRCROOT"]
+            return app
+        }
     }
     
     func assertCmdV() {
-        let keyPress = KeyPressMock.handleKeyPress()
+        let keyPress = waitForKeyPress()
         // Assert there was a key press
         XCTAssertNotNil(keyPress)
         // Assert it was a c + cmd key press
@@ -36,6 +40,18 @@ class YippyUITests: XCTestCase {
         XCTAssertEqual(flags, KeyPressMock.constants.enterEventFlags)
         // Assert there was just a single key press
         XCTAssertNil(KeyPressMock.handleKeyPress())
+    }
+
+    private func waitForKeyPress(timeout: TimeInterval = 3) -> (CGKeyCode, CGEventFlags)? {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            if let keyPress = KeyPressMock.handleKeyPress() {
+                return keyPress
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        } while Date() < deadline
+
+        return nil
     }
     
     func testYippyToggle() {
@@ -316,7 +332,7 @@ class YippyUITests: XCTestCase {
         // Select index 2
         app.getYippyTableViewCell(at: 2).click()
         // Delete
-        app.typeKey(.delete, modifierFlags: .command)
+        app.typeKey(.delete, modifierFlags: .control)
         
         // Check that the item is gone
         XCTAssertEqual(app.yippyTableViewItems.count, 4)
@@ -326,8 +342,8 @@ class YippyUITests: XCTestCase {
         XCTAssertEqual(app.getYippyTableViewItemString(at: 3), "4")
         
         // Delete again
-        app.typeKey(.delete, modifierFlags: .command)
-        app.typeKey(.delete, modifierFlags: .command)
+        app.typeKey(.delete, modifierFlags: .control)
+        app.typeKey(.delete, modifierFlags: .control)
         
         // Check that the items are gone
         XCTAssertEqual(app.yippyTableViewItems.count, 2)
@@ -336,14 +352,14 @@ class YippyUITests: XCTestCase {
         
         // Delete first item
         app.getYippyTableViewCell(at: 0).click()
-        app.typeKey(.delete, modifierFlags: .command)
+        app.typeKey(.delete, modifierFlags: .control)
         
         // Check that the item is gone
         XCTAssertEqual(app.yippyTableViewItems.count, 1)
         XCTAssertEqual(app.getYippyTableViewItemString(at: 0), "1")
         
         // Delete final item
-        app.typeKey(.delete, modifierFlags: .command)
+        app.typeKey(.delete, modifierFlags: .control)
         
         // Check all items gone
         XCTAssertEqual(app.yippyTableViewItems.count, 0)

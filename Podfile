@@ -1,5 +1,4 @@
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+platform :osx, '13.0'
 
 
 project 'Yippy', {
@@ -16,7 +15,6 @@ target 'Yippy' do
 
     # Pods for Yippy
     pod 'Default'
-    pod 'LoginServiceKit', :git => 'https://github.com/Clipy/LoginServiceKit.git'
     pod 'RxSwift', '~> 5'
     pod 'RxCocoa', '~> 5'
 
@@ -26,7 +24,6 @@ target 'Yippy' do
         pod 'RxBlocking', '~> 5'
         pod 'RxTest', '~> 5'
         pod 'Default'
-        pod 'LoginServiceKit', :git => 'https://github.com/Clipy/LoginServiceKit.git'
         pod 'RxSwift', '~> 5'
         pod 'RxCocoa', '~> 5'
     end
@@ -37,7 +34,6 @@ target 'Yippy' do
         pod 'RxBlocking', '~> 5'
         pod 'RxTest', '~> 5'
         pod 'Default'
-        pod 'LoginServiceKit', :git => 'https://github.com/Clipy/LoginServiceKit.git'
         pod 'RxSwift', '~> 5'
         pod 'RxCocoa', '~> 5'
     end

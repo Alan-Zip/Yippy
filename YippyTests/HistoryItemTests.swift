@@ -72,7 +72,34 @@ class HistoryItemTests: XCTestCase {
         XCTAssertEqual(cache.dataCallCount, 1)
     }
     
+    // MARK: - immediatePasteboardItem()
+    func testImmediatePasteboardItemContainsConcreteData() {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "YippyTests.HistoryItem"))
+
+        let item = unsavedItem.immediatePasteboardItem(for: pasteboard)
+
+        XCTAssertEqual(item?.data(forType: .string), unsavedData[.string])
+        XCTAssertNil(item?.string(forType: HistoryItem.historyItemIdType))
+    }
+
+    func testImmediatePasteboardItemCanIncludeHistoryItemId() {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "YippyTests.HistoryItem"))
+
+        let item = unsavedItem.immediatePasteboardItem(for: pasteboard, includeHistoryItemId: true)
+
+        XCTAssertEqual(item?.string(forType: HistoryItem.historyItemIdType), unsavedItem.fsId.uuidString)
+    }
+
+    func testImmediatePasteboardItemReturnsNilWhenUserDataIsMissing() {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "YippyTests.HistoryItem"))
+
+        let item = savedItem.immediatePasteboardItem(for: pasteboard)
+
+        XCTAssertNil(item)
+    }
+
     // MARK: - startCaching()
+    @MainActor
     func testStartCaching() {
         // 1. Start not caching with unsaved data
         XCTAssertFalse(unsavedItem.isCached)
@@ -82,29 +109,21 @@ class HistoryItemTests: XCTestCase {
         unsavedItem.startCaching()
         
         // 3. Unsaved data should be nil and should be caching
-        self.expectation(for: NSPredicate(block: { (_, _) -> Bool in
-            return self.unsavedItem.isCached && self.unsavedItem.unsavedData == nil
-        }), evaluatedWith: nil, handler: nil)
-        
-        waitForExpectations(timeout: 2, handler: nil)
+        XCTAssertTrue(unsavedItem.isCached)
+        XCTAssertNil(unsavedItem.unsavedData)
     }
     
     // MARK: - stopCaching()
+    @MainActor
     func testStopCaching() {
         // 1. Need to make sure caching has started.
-        self.expectation(for: NSPredicate(block: { (_, _) -> Bool in
-            return self.savedItem.isCached
-        }), evaluatedWith: nil, handler: { () -> Bool in
-            // 2. Start caching
-            self.savedItem.stopCaching()
-            return true
-        })
+        XCTAssertTrue(savedItem.isCached)
+        
+        // 2. Stop caching
+        savedItem.stopCaching()
         
         // 3. Unsaved data should be nil and should not be caching
-        self.expectation(for: NSPredicate(block: { (_, _) -> Bool in
-            return !self.savedItem.isCached && self.savedItem.unsavedData == nil
-        }), evaluatedWith: nil, handler: nil)
-        
-        waitForExpectations(timeout: 2, handler: nil)
+        XCTAssertFalse(savedItem.isCached)
+        XCTAssertNil(savedItem.unsavedData)
     }
 }

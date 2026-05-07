@@ -10,9 +10,9 @@ import Foundation
 import Cocoa
 import RxRelay
 import RxSwift
-import LoginServiceKit
 
-class State {
+@MainActor
+final class State: @unchecked Sendable {
     
     // MARK: - Singleton
     static var main = State()
@@ -50,7 +50,7 @@ class State {
         self.isHistoryPanelShown = BehaviorRelay<Bool>(value: false)
         self.panelPosition = BehaviorRelay<PanelPosition>(value: settings.panelPosition)
         self.previewHistoryItem = BehaviorRelay<HistoryItem?>(value: nil)
-        self.launchAtLogin = BehaviorRelay<Bool>(value: LoginServiceKit.isExistLoginItems())
+        self.launchAtLogin = BehaviorRelay<Bool>(value: LaunchAtLoginService.isEnabled)
         self.showsRichText = BehaviorRelay<Bool>(value: settings.showsRichText)
         self.pastesRichText = BehaviorRelay<Bool>(value: settings.pastesRichText)
         self.currentScreen = BehaviorRelay<NSScreen>(value: Self.getCurrentScreen(forMouseLocation: NSEvent.mouseLocation))
@@ -90,9 +90,11 @@ class State {
     
     static func monitorMousePosition(state: State) {
         Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (_) in
-            let currentScreen = getCurrentScreen(forMouseLocation: NSEvent.mouseLocation)
-            if currentScreen != state.currentScreen.value {
-                state.currentScreen.accept(currentScreen)
+            Task { @MainActor in
+                let currentScreen = getCurrentScreen(forMouseLocation: NSEvent.mouseLocation)
+                if currentScreen != state.currentScreen.value {
+                    state.currentScreen.accept(currentScreen)
+                }
             }
         }
     }

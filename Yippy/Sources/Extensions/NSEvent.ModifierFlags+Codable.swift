@@ -9,6 +9,6 @@
 import Foundation
 import Cocoa
 
-extension NSEvent.ModifierFlags: Codable {
+extension NSEvent.ModifierFlags: @retroactive Codable {
     
 }

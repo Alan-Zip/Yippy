@@ -9,6 +9,7 @@
 import Foundation
 import Cocoa
 
+@MainActor
 class YippyHistory {
     
     let history: History
@@ -23,15 +24,19 @@ class YippyHistory {
     }
     
     func paste(selected: Int) {
+        guard items.indices.contains(selected) else {
+            return
+        }
+
+        let item = items[selected]
+
         // Internally action the pasteboard change
         // Our pasteboard monitor will detect the change
         // But our `History` will know that it has already been consumed
-        history.moveItem(at: selected, to: 0)
-        let newChangeCount = pasteboard.clearContents()
-        history.recordPasteboardChange(withCount: newChangeCount)
-        
-        // Write object
-        pasteboard.writeObjects([items[selected]])
+        if selected != 0 {
+            history.moveItem(at: selected, to: 0)
+        }
+        writeToPasteboard(item)
         
         DispatchQueue.global().async {
             DispatchQueue.main.async {
@@ -80,15 +85,25 @@ class YippyHistory {
     }
     
     func move(from: Int, to: Int) {
+        guard items.indices.contains(from) else {
+            return
+        }
+
+        let item = items[from]
         history.moveItem(at: from, to: to)
         
         if to == 0 {
-            let newChangeCount = pasteboard.clearContents()
-            history.recordPasteboardChange(withCount: newChangeCount)
-            
-            // Write object
-            pasteboard.writeObjects([items[from]])
+            writeToPasteboard(item)
         }
     }
-}
 
+    private func writeToPasteboard(_ item: HistoryItem) {
+        pasteboard.clearContents()
+
+        if let pasteboardItem = item.immediatePasteboardItem(for: pasteboard) {
+            pasteboard.writeObjects([pasteboardItem])
+        }
+
+        history.recordPasteboardChange(withCount: pasteboard.changeCount)
+    }
+}

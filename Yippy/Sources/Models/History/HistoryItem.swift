@@ -11,7 +11,7 @@ import Cocoa
 import Quartz
 
 /// Interface for an item that was on the pasteboard
-class HistoryItem: NSObject {
+class HistoryItem: NSObject, @unchecked Sendable {
     
     // MARK: - Private attributes
     
@@ -49,7 +49,7 @@ class HistoryItem: NSObject {
     /// Static definition of whether the history items should write RTF data to the pasteboard.
     ///
     /// This value is used when determining the writable types for an item.
-    static var pastesRichText = true
+    nonisolated(unsafe) static var pastesRichText = true
     
     
     // MARK: - Constructors
@@ -111,6 +111,26 @@ class HistoryItem: NSObject {
             data[type] = self.data(forType: type)
         }
         return data
+    }
+
+    func immediatePasteboardItem(for pasteboard: NSPasteboard, includeHistoryItemId: Bool = false) -> NSPasteboardItem? {
+        let pasteboardItem = NSPasteboardItem()
+        var hasUserData = false
+
+        for type in writableTypes(for: pasteboard) {
+            if type == Self.historyItemIdType {
+                if includeHistoryItemId {
+                    pasteboardItem.setString(fsId.uuidString, forType: type)
+                }
+                continue
+            }
+
+            if let data = data(forType: type), pasteboardItem.setData(data, forType: type) {
+                hasUserData = true
+            }
+        }
+
+        return hasUserData ? pasteboardItem : nil
     }
     
     /// Starts caching the item.
@@ -182,22 +202,6 @@ class HistoryItem: NSObject {
     func getPng() -> NSImage? {
         guard let data = data(forType: .png) else { return nil }
         return NSImage(data: data)
-    }
-    
-    func getThumbnailImage() -> NSImage? {
-        var image: NSImage?
-        DispatchQueue.global(qos: .userInteractive).sync {
-            guard let url = getFileUrl() else { return }
-            let ref = QLThumbnailCreate(kCFAllocatorDefault, url as CFURL, CGSize(width: 300, height: 300), [kQLThumbnailOptionIconModeKey: true] as CFDictionary)
-            
-            guard let thumbnail = ref?.takeRetainedValue() else { return }
-            let cgImageRef = QLThumbnailCopyImage(thumbnail)
-            guard let cgImage = cgImageRef?.takeRetainedValue() else { return }
-            image = NSImage(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
-        }
-        return image
-        
-        
     }
     
     func getFileIcon() -> NSImage? {

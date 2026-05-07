@@ -8,6 +8,7 @@
 
 import Foundation
 
+@MainActor
 struct YippyHotKeys {
     
     static var toggle = YippyHotKey(key: .v, modifiers: [.command, .shift])

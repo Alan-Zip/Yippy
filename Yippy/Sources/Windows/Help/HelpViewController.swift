@@ -11,40 +11,64 @@ import Cocoa
 
 class HelpViewController: NSViewController {
     
-    var timer: Timer!
+    private static let waitingContentSize = NSSize(width: 457, height: 253)
+    private static let instructionsContentSize = NSSize(width: 568, height: 468)
+
+    private var timer: Timer?
     
     @IBOutlet var waitingView: NSView!
     @IBOutlet var instructionsView: NSView!
     
-    var hasControl = false
+    private var hasControl = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        hasControl = Helper.isControlGranted(showPopup: false)
-        waitingView.isHidden = hasControl
-        instructionsView.isHidden = !hasControl
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { (t) in
-            let new = Helper.isControlGranted(showPopup: false)
-            if new != self.hasControl {
-                self.hasControl = new
-                self.waitingView.isHidden = self.hasControl
-                self.instructionsView.isHidden = !self.hasControl
-                
-                self.updateSize()
-            }
-        }
+        refreshControlState(forceUpdate: true)
     }
     
     override func viewWillAppear() {
         super.viewWillAppear()
         
+        startTimer()
+        refreshControlState(forceUpdate: true)
+        updateSize()
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+
+        stopTimer()
+    }
+
+    private func startTimer() {
+        guard timer == nil else { return }
+
+        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(controlTimerFired(_:)), userInfo: nil, repeats: true)
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    @objc private func controlTimerFired(_ timer: Timer) {
+        refreshControlState()
+    }
+
+    private func refreshControlState(forceUpdate: Bool = false) {
+        let newValue = Helper.isControlGranted()
+        guard forceUpdate || newValue != hasControl else { return }
+
+        hasControl = newValue
+        waitingView.isHidden = hasControl
+        instructionsView.isHidden = !hasControl
         updateSize()
     }
     
-    func updateSize() {
-        self.view.window?.setContentSize(self.hasControl ? instructionsView.fittingSize : waitingView.fittingSize)
+    private func updateSize() {
+        let contentSize = hasControl ? Self.instructionsContentSize : Self.waitingContentSize
+        self.view.window?.setContentSize(contentSize)
         self.view.window?.center()
     }
 }

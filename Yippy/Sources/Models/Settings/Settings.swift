@@ -127,3 +127,5 @@ extension Settings {
 extension Settings: Equatable {
     
 }
+
+extension Settings: @unchecked Sendable {}

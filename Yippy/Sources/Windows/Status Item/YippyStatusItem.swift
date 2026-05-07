@@ -9,6 +9,7 @@
 import Foundation
 import Cocoa
 
+@MainActor
 class YippyStatusItem {
     
     static var statusItemButtonImage = NSImage(named: NSImage.Name("YippyStatusBarIcon"))
@@ -18,6 +19,8 @@ class YippyStatusItem {
         
         if let button = statusItem.button {
             button.image = statusItemButtonImage
+            button.imagePosition = .imageOnly
+            button.toolTip = "Yippy"
             button.setAccessibilityIdentifier(Accessibility.identifiers.statusItemButton)
         }
         

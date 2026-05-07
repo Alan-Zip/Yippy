@@ -10,6 +10,7 @@ import Foundation
 
 struct UITesting {
     
+    @MainActor
     static func setupUITestEnvironment(launchArgs: [String], environment: [String: String]) throws {
         // Mock the access control and key pressing
         Helper.accessControlHelper = AccessControlHelperMock()
@@ -40,6 +41,14 @@ struct UITesting {
         }
         let test = groups[1]
         
+        if test == "Empty" {
+            if FileManager.default.fileExists(atPath: Constants.urls.yippyAppSupport.path) {
+                try FileManager.default.removeItem(at: Constants.urls.yippyAppSupport)
+            }
+            try FileManager.default.createDirectory(at: Constants.urls.yippyAppSupport, withIntermediateDirectories: true)
+            return
+        }
+
         guard let srcroot = environment["SRCROOT"] else {
             throw NSError(domain: "UITestError", code: 0, userInfo: [
                 NSLocalizedDescriptionKey: "Cannot load test app support directory because the SRCROOT environment variable is not set."

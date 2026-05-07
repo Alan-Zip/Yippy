@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import HotKey  // Normally this would be a @testable import, but this is not currently supported by the Swift Package Manager. See: https://stackoverflow.com/a/52672307
+@preconcurrency import HotKey  // Normally this would be a @testable import, but this is not currently supported by the Swift Package Manager. See: https://stackoverflow.com/a/52672307
 @testable import Yippy
 
 class YippyHotKeyTests: XCTestCase {
@@ -20,6 +20,7 @@ class YippyHotKeyTests: XCTestCase {
         yippyHotKey = YippyHotKey(hotKey: hotKey)
     }
     
+    @MainActor
     func testKeyUp() {
         // 1. Given a handler registered to the hot key
         let keyUpHandlerCalled = expectation(description: "keyUpHandlerCalled")
@@ -35,6 +36,7 @@ class YippyHotKeyTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
     
+    @MainActor
     func testKeyDown() {
         // 1. Given a handler registered to the hot key
         let keyDownHandlerCalled = expectation(description: "keyDownHandlerCalled")
@@ -50,6 +52,7 @@ class YippyHotKeyTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
     
+    @MainActor
     func testIsPaused() {
         // 1. Given a handler registered to the hot key
         let keyDownHandlerCalled = expectation(description: "keyDownHandlerCalled")
@@ -67,6 +70,7 @@ class YippyHotKeyTests: XCTestCase {
         waitForExpectations(timeout: 0.5, handler: nil)
     }
     
+    @MainActor
     func testLongPress() {
         // 1. Given a handler registered to the hot key and the following long press settings
         let keyDownHandlerCalled = expectation(description: "keyDownHandlerCalled")

@@ -10,7 +10,7 @@ import Foundation
 import Cocoa
 
 /// Cache for history.
-class HistoryCache {
+class HistoryCache: @unchecked Sendable {
     
     // MARK: - Private structures
     
@@ -101,7 +101,7 @@ class HistoryCache {
                 return
             }
             // If we're not caching the item, just return the data
-            if !self.isItemRegistered(id) {
+            if !self.cachedData.keys.contains(id) {
                 retData = data
                 return
             }
@@ -135,7 +135,7 @@ class HistoryCache {
     ///
     /// - Parameter id: the id of the item to regsiter for caching.
     func registerItem(withId id: UUID) {
-        accessQueue.async(flags: .barrier) {
+        accessQueue.sync(flags: .barrier) {
             if !self.cachedData.keys.contains(id) {
                 self.cachedData[id] = [:]
             }
@@ -148,7 +148,7 @@ class HistoryCache {
     ///
     /// - Parameter id: the id of the item to unregsiter from caching.
     func unregisterItem(withId id: UUID) {
-        accessQueue.async(flags: .barrier) {
+        accessQueue.sync(flags: .barrier) {
             if let data = self.cachedData.removeValue(forKey: id) {
                 self._currentCacheSize -= data.reduce(0, {$0 + $1.value.count})
                 self.usage.removeAll(where: {$0.id == id})
@@ -161,7 +161,9 @@ class HistoryCache {
     /// - Parameter id: The id of the item to register.
     /// - Returns: `true` if the item is registered, `false` otherwise.
     func isItemRegistered(_ id: UUID) -> Bool {
-        return cachedData.keys.contains(id)
+        accessQueue.sync {
+            return cachedData.keys.contains(id)
+        }
     }
     
     

@@ -12,7 +12,7 @@ import HotKey
 
 struct KeyPressMock {
     
-    static let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "Yippy.UITesting.KeyPress"))
+    nonisolated(unsafe) static let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "Yippy.UITesting.KeyPress"))
     
     static func keyPress(keyCode: CGKeyCode, flags: CGEventFlags) {
         pasteboard.declareTypes([.string], owner: nil)

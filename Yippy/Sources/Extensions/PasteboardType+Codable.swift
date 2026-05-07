@@ -9,7 +9,7 @@
 import Foundation
 import Cocoa
 
-extension NSPasteboard.PasteboardType: Codable {
+extension NSPasteboard.PasteboardType: @retroactive Codable {
     // Literally don't need to do anything
 }
 

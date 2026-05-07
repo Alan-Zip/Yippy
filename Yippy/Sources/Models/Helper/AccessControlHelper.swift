@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ApplicationServices
 
 class AccessControlHelper {
     
@@ -18,7 +19,7 @@ class AccessControlHelper {
     
     func isControlGranted(showPopup: Bool) -> Bool {
         // get the value for accesibility
-        let checkOptPrompt = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString
+        let checkOptPrompt = "AXTrustedCheckOptionPrompt" as NSString
         // set the options: false means it wont ask
         // true means it will popup and ask
         let options = [checkOptPrompt: showPopup]

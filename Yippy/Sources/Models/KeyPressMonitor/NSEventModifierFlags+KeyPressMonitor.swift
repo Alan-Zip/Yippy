@@ -64,7 +64,7 @@ extension NSEvent.ModifierFlags {
         return list
     }
     
-    static var recommended: NSEvent.ModifierFlags = NSEvent.ModifierFlags(arrayLiteral: .command, .control, .option, .shift)
-    static var all: NSEvent.ModifierFlags = NSEvent.ModifierFlags(arrayLiteral: .capsLock, .command, .control, .deviceIndependentFlagsMask, .function, .help, .numericPad, .option, .shift)
-    static var none: NSEvent.ModifierFlags = .init()
+    static let recommended: NSEvent.ModifierFlags = NSEvent.ModifierFlags(arrayLiteral: .command, .control, .option, .shift)
+    static let all: NSEvent.ModifierFlags = NSEvent.ModifierFlags(arrayLiteral: .capsLock, .command, .control, .deviceIndependentFlagsMask, .function, .help, .numericPad, .option, .shift)
+    static let none: NSEvent.ModifierFlags = .init()
 }

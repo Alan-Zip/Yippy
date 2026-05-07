@@ -10,7 +10,8 @@ import Foundation
 import Cocoa
 
 /// Handles the interfacing with a `FileManager` object to save and retrieve history data.
-class HistoryFileManager {
+class HistoryFileManager: @unchecked Sendable {
+    typealias CompletionHandler = @Sendable (Bool) -> Void
     
     var fileManager: FileManager
     var orderManager: ArrayFileManager
@@ -20,7 +21,7 @@ class HistoryFileManager {
     var warningLogger: WarningLogger
     var alerter: Alerter
     
-    static var `default` = HistoryFileManager()
+    static let `default` = HistoryFileManager()
     
     init(
         fileManager: FileManager = FileManager.default,
@@ -43,7 +44,7 @@ class HistoryFileManager {
         self.dispatchQueue = dispatchQueue ?? DispatchQueue(label: "HistoryFileManagerQueue", qos: .background)
     }
     
-    private func callHander(_ handler: ((Bool) -> Void)?, withVal val: Bool) {
+    private func callHander(_ handler: CompletionHandler?, withVal val: Bool) {
         if let handler = handler {
             handler(val)
         }
@@ -79,7 +80,7 @@ class HistoryFileManager {
         // Directory is already set up.
     }
     
-    func saveHistoryOrder(history: [HistoryItem], completionHandler: ((Bool) -> Void)? = nil) {
+    func saveHistoryOrder(history: [HistoryItem], completionHandler: CompletionHandler? = nil) {
         dispatchQueue.async {
             let res = self.writeHistoryOrder(history: history)
             if let c = completionHandler {
@@ -202,7 +203,7 @@ class HistoryFileManager {
         return History(cache: cache, items: orderedItems)
     }
     
-    func insertItem(newHistory: [HistoryItem], at i: Int, completionHandler handler: ((Bool) -> Void)? = nil) {
+    func insertItem(newHistory: [HistoryItem], at i: Int, completionHandler handler: CompletionHandler? = nil) {
         dispatchQueue.async {
             // First check that we have unsaved data to save
             guard let unsavedData = newHistory[i].unsavedData else {
@@ -239,11 +240,12 @@ class HistoryFileManager {
                 catch {
                     let historyError = YippyError(code: 0, userInfo: [
                         NSLocalizedDescriptionKey: "Failed to save new pasteboard item due to error: \(error.localizedDescription) Attempted to save pasteboard item at '\(itemUrl)'."
-                    ])
-                    historyError.log(with: self.errorLogger)
-                    self.callHander(handler, withVal: false)
-                    return
-                }
+                ])
+                historyError.log(with: self.errorLogger)
+                historyError.show(with: self.alerter)
+                self.callHander(handler, withVal: false)
+                return
+            }
             }
             
             // Start caching now that the data is written
@@ -254,7 +256,7 @@ class HistoryFileManager {
         }
     }
     
-    func deleteItem(newHistory: [HistoryItem], deleted: HistoryItem, completionHandler handler: ((Bool) -> Void)? = nil) {
+    func deleteItem(newHistory: [HistoryItem], deleted: HistoryItem, completionHandler handler: CompletionHandler? = nil) {
         dispatchQueue.async {
             // Delete the folder
             do {
@@ -278,7 +280,7 @@ class HistoryFileManager {
         }
     }
     
-    func reduce(oldHistory: [HistoryItem], toSize size: Int, completionHandler handler: ((Bool) -> Void)? = nil) {
+    func reduce(oldHistory: [HistoryItem], toSize size: Int, completionHandler handler: CompletionHandler? = nil) {
         if oldHistory.count <= size {
             callHander(handler, withVal: true)
             return
@@ -308,11 +310,11 @@ class HistoryFileManager {
         }
     }
     
-    func moveItem(newHistory: [HistoryItem], from: Int, to: Int, completionHandler: ((Bool) -> Void)? = nil) {
+    func moveItem(newHistory: [HistoryItem], from: Int, to: Int, completionHandler: CompletionHandler? = nil) {
         saveHistoryOrder(history: newHistory, completionHandler: completionHandler)
     }
     
-    func clearHistory(completionHandler handler: ((Bool) -> Void)? = nil) {
+    func clearHistory(completionHandler handler: CompletionHandler? = nil) {
         dispatchQueue.async {
             // Delete the old history
             do {

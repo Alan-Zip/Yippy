@@ -9,11 +9,11 @@
 import XCTest
 @testable import Yippy
 
-class AlerterMock: Alerter {
+class AlerterMock: Alerter, @unchecked Sendable {
     
     var expectation: XCTestExpectation!
     
-    override func show(_ alertable: Alertable) {
+    override func show(_ alertable: any Alertable) {
         expectation.fulfill()
     }
 }

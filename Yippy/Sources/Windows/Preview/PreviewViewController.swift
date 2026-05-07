@@ -11,6 +11,7 @@ import Cocoa
 import RxSwift
 import RxRelay
 
+@MainActor
 protocol PreviewViewController: NSViewController {
     
     static var identifier: NSStoryboard.SceneIdentifier { get }

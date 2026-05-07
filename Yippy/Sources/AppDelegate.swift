@@ -12,7 +12,8 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
-@NSApplicationMain
+@main
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     let disposeBag = DisposeBag()
@@ -50,9 +51,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func showWelcomeIfNeeded() {
         // If the user has enabled access we don't need to do anything
-        if Helper.isControlGranted(showPopup: false) {
+        if Helper.isControlGranted() {
             return
         }
+
+        #if DEBUG
+        guard CommandLine.arguments.contains("--uitesting") else {
+            return
+        }
+        #endif
         
         // Otherwise we should show a popup detailing why access is required.
         Controller.main.welcomeWindowController.showWindow(nil)

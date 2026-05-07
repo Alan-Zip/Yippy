@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 
 extension HistoryItem {
     
     func getTableViewItemType() -> YippyItem.Type {
-        if getFileUrl() != nil {
-            if getThumbnailImage() != nil {
+        if let fileUrl = getFileUrl() {
+            if fileUrl.yippyUsesThumbnailCell {
                 return YippyFileThumbnailCellView.self
             }
             else {
@@ -28,5 +29,17 @@ extension HistoryItem {
         else {
             return YippyTextCellView.self
         }
+    }
+}
+
+private extension URL {
+    var yippyUsesThumbnailCell: Bool {
+        guard let contentType = try? resourceValues(forKeys: [.contentTypeKey]).contentType else {
+            return false
+        }
+
+        return contentType.conforms(to: .image)
+            || contentType.conforms(to: .pdf)
+            || contentType.conforms(to: .movie)
     }
 }

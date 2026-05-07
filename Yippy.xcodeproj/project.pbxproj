@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -136,12 +136,12 @@
 		34E516CD2352C4AF008B4256 /* YippyItemBaseCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E516CC2352C4AF008B4256 /* YippyItemBaseCellView.swift */; };
 		34E516CF2352C4D4008B4256 /* YippyItemContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E516CE2352C4D4008B4256 /* YippyItemContentView.swift */; };
 		34E56483235E777E00E362CF /* NSTextCheckingResult+Groups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E56482235E777E00E362CF /* NSTextCheckingResult+Groups.swift */; };
-		34EC0FF42504A599004E1A63 /* Fuse in Frameworks */ = {isa = PBXBuildFile; productRef = 34EC0FF32504A599004E1A63 /* Fuse */; };
 		34EC0FF72504AC9C004E1A63 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34EC0FF62504AC9C004E1A63 /* Search.swift */; };
 		34EC0FF92504ADE7004E1A63 /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34EC0FF82504ADE7004E1A63 /* SearchEngine.swift */; };
 		34F1047D23542CCE00B65251 /* HistoryItem+YippyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F1047C23542CCE00B65251 /* HistoryItem+YippyItem.swift */; };
 		34F1047E23542D1600B65251 /* PasteboardType+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345BAE3323500E4B008ACB4C /* PasteboardType+Codable.swift */; };
 		B8A057305B33D2028FC0EC05 /* Pods_YippyUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06717A6CF5535260A83784EF /* Pods_YippyUITests.framework */; };
+		C0DE00022634500000000002 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00012634500000000001 /* LaunchAtLoginService.swift */; };
 		D104B1D4E210055A8E6424F0 /* Pods_YippyTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1AA8E9C3FA65CDE7DA527C7 /* Pods_YippyTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -308,6 +308,7 @@
 		B1AA8E9C3FA65CDE7DA527C7 /* Pods_YippyTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_YippyTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B2145CEF513C8B71E739A5 /* Pods-YippyUITests.xctest.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YippyUITests.xctest.xcconfig"; path = "Target Support Files/Pods-YippyUITests/Pods-YippyUITests.xctest.xcconfig"; sourceTree = "<group>"; };
 		C0ACFCB0B26BF8B8E6EF42EA /* Pods_Yippy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Yippy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DE00012634500000000001 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
 		C555279B4167FBDCA36E01CC /* Pods-YippyUITests.beta debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YippyUITests.beta debug.xcconfig"; path = "Target Support Files/Pods-YippyUITests/Pods-YippyUITests.beta debug.xcconfig"; sourceTree = "<group>"; };
 		D494A85C58610499F7B77533 /* Pods-YippyTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YippyTests.release.xcconfig"; path = "Target Support Files/Pods-YippyTests/Pods-YippyTests.release.xcconfig"; sourceTree = "<group>"; };
 		D645D0527FE8FF6EF353F28D /* Pods-YippyUITests.beta release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YippyUITests.beta release.xcconfig"; path = "Target Support Files/Pods-YippyUITests/Pods-YippyUITests.beta release.xcconfig"; sourceTree = "<group>"; };
@@ -324,7 +325,6 @@
 			files = (
 				344C1162234DD2EF00B35DC9 /* Quartz.framework in Frameworks */,
 				34545E50267715D600D6404D /* HotKey in Frameworks */,
-				34EC0FF42504A599004E1A63 /* Fuse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,6 +627,7 @@
 				34268120233EE7F900BA226A /* Helper */,
 				34A30CC22356B92000D4C2D6 /* History */,
 				341D9D2323372494008A2BE6 /* KeyPressMonitor */,
+				C0DE00012634500000000001 /* LaunchAtLoginService.swift */,
 				34B2FD9422F98B1A0068D50A /* PanelPosition.swift */,
 				34734C7D2330CB6A0056F855 /* PasteboardMonitor */,
 				343F4116233C5A6F004DA324 /* Settings */,
@@ -796,7 +797,6 @@
 			);
 			name = Yippy;
 			packageProductDependencies = (
-				34EC0FF32504A599004E1A63 /* Fuse */,
 				34545E4F267715D600D6404D /* HotKey */,
 			);
 			productName = Yippy;
@@ -851,7 +851,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 2630;
 				ORGANIZATIONNAME = MatthewDavidson;
 				TargetAttributes = {
 					34ACFBBA22EB0B0F004E6E63 = {
@@ -883,7 +883,6 @@
 			mainGroup = 34ACFBB222EB0B0E004E6E63;
 			packageReferences = (
 				345DCFBB2420C2D2003E214D /* XCRemoteSwiftPackageReference "HotKey" */,
-				34EC0FF22504A599004E1A63 /* XCRemoteSwiftPackageReference "fuse-swift" */,
 			);
 			productRefGroup = 34ACFBBC22EB0B0F004E6E63 /* Products */;
 			projectDirPath = "";
@@ -954,9 +953,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-YippyTests/Pods-YippyTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-YippyTests/Pods-YippyTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -971,9 +974,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-YippyUITests/Pods-YippyUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-YippyUITests/Pods-YippyUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1032,9 +1039,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Yippy/Pods-Yippy-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Yippy/Pods-Yippy-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1098,6 +1109,7 @@
 				3486C0A6234416A4004B2F2E /* YippyTableView.swift in Sources */,
 				345131F82383B6EE002D9D03 /* PreviewQLViewController.swift in Sources */,
 				341D9D2D23372592008A2BE6 /* EventMonitor.swift in Sources */,
+				C0DE00022634500000000002 /* LaunchAtLoginService.swift in Sources */,
 				341D9D2B23372550008A2BE6 /* KeyAction.swift in Sources */,
 				341FFEE92442EDA500C47E6D /* HistoryItemText.swift in Sources */,
 				34D018E9232B4CFC006259E1 /* HelpWindowController.swift in Sources */,
@@ -1274,7 +1286,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1330,7 +1342,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
@@ -1347,23 +1359,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Yippy/Supporting Files/Yippy.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = HY8YZ2D6M7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = "Yippy/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 2.8.1;
-				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.Yippy;
-				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.Yippy.Dev;
+				PRODUCT_MODULE_NAME = Yippy;
+				PRODUCT_NAME = "Yippy Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -1374,23 +1387,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Yippy/Supporting Files/Yippy.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = HY8YZ2D6M7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = "Yippy/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 2.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.Yippy;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -1411,7 +1425,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Yippy.app/Contents/MacOS/Yippy";
 			};
 			name = Debug;
@@ -1433,7 +1447,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Yippy.app/Contents/MacOS/Yippy";
 			};
 			name = Release;
@@ -1454,7 +1468,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Yippy;
 			};
 			name = Debug;
@@ -1475,7 +1489,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Yippy;
 			};
 			name = Release;
@@ -1531,7 +1545,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1552,21 +1566,21 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = HY8YZ2D6M7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = "Yippy/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 2.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyBeta;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME) Beta";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG BETA";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = "Beta Debug";
 		};
@@ -1587,7 +1601,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Yippy.app/Contents/MacOS/Yippy";
 			};
 			name = "Beta Debug";
@@ -1608,7 +1622,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Yippy;
 			};
 			name = "Beta Debug";
@@ -1658,7 +1672,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
@@ -1678,21 +1692,21 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = HY8YZ2D6M7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = "Yippy/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 2.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyBeta;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME) Beta";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = BETA;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = "Beta Release";
 		};
@@ -1713,7 +1727,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Yippy.app/Contents/MacOS/Yippy";
 			};
 			name = "Beta Release";
@@ -1734,7 +1748,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Yippy;
 			};
 			name = "Beta Release";
@@ -1790,7 +1804,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1811,20 +1825,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = HY8YZ2D6M7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = "Yippy/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 2.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyXCTest;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG XCTEST";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = XCTest;
 		};
@@ -1846,7 +1860,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Yippy.app/Contents/MacOS/Yippy";
 			};
 			name = XCTest;
@@ -1867,7 +1881,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = MatthewDavidson.YippyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Yippy;
 			};
 			name = XCTest;
@@ -1934,14 +1948,6 @@
 				version = 0.1.5;
 			};
 		};
-		34EC0FF22504A599004E1A63 /* XCRemoteSwiftPackageReference "fuse-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krisk/fuse-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.4.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1949,11 +1955,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 345DCFBB2420C2D2003E214D /* XCRemoteSwiftPackageReference "HotKey" */;
 			productName = HotKey;
-		};
-		34EC0FF32504A599004E1A63 /* Fuse */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 34EC0FF22504A599004E1A63 /* XCRemoteSwiftPackageReference "fuse-swift" */;
-			productName = Fuse;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

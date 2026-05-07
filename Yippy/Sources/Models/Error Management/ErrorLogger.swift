@@ -8,9 +8,8 @@
 
 import Foundation
 
-class ErrorLogger: Logger {
+class ErrorLogger: Logger, @unchecked Sendable {
     
     static let general = ErrorLogger(url: Constants.urls.errorLog)
 }
-
 

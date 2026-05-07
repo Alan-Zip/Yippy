@@ -9,7 +9,7 @@
 import Foundation
 import Cocoa
 
-class Logger {
+class Logger: @unchecked Sendable {
     
     var url: URL
     
@@ -81,13 +81,13 @@ class Timestamp: CustomStringConvertible {
         self.date = date
     }
     
-    static var dateFormatter: DateFormatter = {
+    private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         return formatter
-    }()
+    }
     
     var description: String {
-        return Self.dateFormatter.string(from: date)
+        return dateFormatter.string(from: date)
     }
 }

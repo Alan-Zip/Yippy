@@ -11,6 +11,7 @@ import XCTest
 
 class PasteboardMonitorTests: XCTestCase {
     
+    @MainActor
     func testPasteboardDidChangeCalled() {
         // 1. Given
         let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "test"))
@@ -25,6 +26,7 @@ class PasteboardMonitorTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    @MainActor
     func testPerformancePasteboardChangeDetection() {
         self.measure {
             testPasteboardDidChangeCalled()
@@ -40,7 +42,7 @@ class PasteboardMonitorDelegateMock: PasteboardMonitorDelegate {
         self.expectation = expectation
     }
     
-    func pasteboardDidChange(_ pasteboard: NSPasteboard) {
+    func pasteboardDidChange(_ pasteboard: NSPasteboard, originBundleId: String?) {
         expectation.fulfill()
     }
 }

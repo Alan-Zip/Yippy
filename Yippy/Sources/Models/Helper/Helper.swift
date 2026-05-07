@@ -7,7 +7,9 @@
 //
 
 import Foundation
+import CoreGraphics
 
+@MainActor
 class Helper {
     
     // MARK: - Key Press
@@ -34,7 +36,6 @@ class Helper {
         return Helper.accessControlHelper.isControlGranted(showPopup: showPopup)
     }
 }
-
 
 
 

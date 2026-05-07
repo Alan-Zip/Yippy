@@ -9,7 +9,7 @@
 import Foundation
 import Cocoa
 
-struct YippyError: Loggable, Alertable, Error {
+struct YippyError: Loggable, Alertable, Error, @unchecked Sendable {
     
     var error: Error
     
@@ -44,6 +44,7 @@ struct YippyError: Loggable, Alertable, Error {
         ])
     }
     
+    @MainActor
     func createAlert() -> NSAlert {
         return NSAlert(error: error)
     }

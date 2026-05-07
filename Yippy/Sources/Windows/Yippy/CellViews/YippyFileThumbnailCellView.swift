@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import QuickLook
-import Quartz
+import Cocoa
+import QuickLookThumbnailing
 
 class YippyFileThumbnailCellView: YippyItemBaseCellView, YippyItem {
     
@@ -24,6 +24,8 @@ class YippyFileThumbnailCellView: YippyItemBaseCellView, YippyItem {
     
     var previewView: NSImageView!
     
+    private var representedFileURL: URL?
+
     override func commonInit() {
         super.commonInit()
         
@@ -37,6 +39,7 @@ class YippyFileThumbnailCellView: YippyItemBaseCellView, YippyItem {
     func setupPreviewView() {
         previewView.translatesAutoresizingMaskIntoConstraints = false
         previewView.imageAlignment = .alignCenter
+        previewView.imageScaling = .scaleProportionallyUpOrDown
         contentView.addConstraint(NSLayoutConstraint(item: previewView!, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: Self.imageTopPadding))
         previewView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         previewView.widthAnchor.constraint(equalToConstant: Self.imageSize.width).isActive = true
@@ -56,21 +59,28 @@ class YippyFileThumbnailCellView: YippyItemBaseCellView, YippyItem {
     
     func setupCell(withYippyTableView yippyTableView: YippyTableView, forHistoryItem historyItem: HistoryItem, at i: Int) {
         guard let url = historyItem.getFileUrl() else { return }
+        representedFileURL = url
+        previewView.image = NSWorkspace.shared.icon(forFile: url.path)
         itemTextView.attributedText = formatFileUrl(url)
         setupShortcutTextView(at: i)
         setHighlight(isSelected: yippyTableView.isRowSelected(i))
         
-        DispatchQueue.global(qos: .background).async {
-            let cgImageRef = QLThumbnailImageCreate(kCFAllocatorDefault, url as CFURL, CGSize(width: 200, height: 200), [kQLThumbnailOptionIconModeKey: false, kQLThumbnailOptionScaleFactorKey: 4] as CFDictionary)
+        let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
+        let request = QLThumbnailGenerator.Request(fileAt: url, size: Self.imageSize, scale: scale, representationTypes: .thumbnail)
+        QLThumbnailGenerator.shared.generateBestRepresentation(for: request) { [weak self] thumbnail, error in
+            let thumbnailData = thumbnail?.nsImage.tiffRepresentation
+            let errorDescription = error?.localizedDescription
             
             DispatchQueue.main.async {
-                if let cgImage = cgImageRef?.takeRetainedValue() {
-                    let image = NSImage(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
-                    self.previewView.image = image
+                guard let self = self, self.representedFileURL == url else {
+                    return
                 }
-                else {
-                    ErrorLogger.general.log(YippyError(localizedDescription: "Failed to create thumbnail for file with url '\(url.path)'"))
-                    self.previewView.image = nil
+
+                if let thumbnailData = thumbnailData {
+                    self.previewView.image = NSImage(data: thumbnailData)
+                }
+                else if let errorDescription = errorDescription {
+                    ErrorLogger.general.log(YippyError(localizedDescription: "Failed to create thumbnail for file with url '\(url.path)' due to error: \(errorDescription)"))
                 }
             }
         }

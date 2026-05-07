@@ -10,8 +10,8 @@ import Foundation
 import Cocoa
 import RxSwift
 import RxRelay
-import LoginServiceKit
 
+@MainActor
 class Controller {
     
     // MARK: - Singleton
@@ -66,7 +66,17 @@ class Controller {
     // MARK: - Constructor Helpers
     
     static func createMenu(settings: Settings, state: State, target: AnyObject?) -> NSMenu {
-        let menu = NSMenu()
+        var menu = NSMenu()
+
+        #if DEBUG
+        menu = menu
+            .with(menuItem: NSMenuItem(title: "Yippy Dev", action: nil, keyEquivalent: "")
+                .with(isEnabled: false)
+            )
+            .with(menuItem: NSMenuItem.separator())
+        #endif
+
+        menu = menu
             .with(menuItem: NSMenuItem(title: "About Yippy", action: #selector(showAboutWindow), keyEquivalent: "")
                 .with(accessibilityIdentifier: Accessibility.identifiers.aboutButton)
             )
@@ -237,13 +247,8 @@ class Controller {
     }
     
     @objc func launchAtLogin() {
-        let launchAtLogin = !state.launchAtLogin.value
-        state.launchAtLogin.accept(launchAtLogin)
-        if launchAtLogin {
-            LoginServiceKit.addLoginItems()
-        }
-        else {
-            LoginServiceKit.removeLoginItems()
-        }
+        let shouldLaunchAtLogin = !state.launchAtLogin.value
+        _ = LaunchAtLoginService.setEnabled(shouldLaunchAtLogin)
+        state.launchAtLogin.accept(LaunchAtLoginService.isEnabled)
     }
 }

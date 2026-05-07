@@ -40,6 +40,7 @@ class YippyViewController: NSViewController {
     
     let results = BehaviorRelay(value: Results(items: [], isSearchResult: false))
     let selected = BehaviorRelay<Int?>(value: nil)
+    private var localReturnKeyMonitor: Any?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,7 +79,6 @@ class YippyViewController: NSViewController {
         YippyHotKeys.pageUp.onDown(goToPreviousItem)
         YippyHotKeys.pageUp.onLong(goToPreviousItem)
         YippyHotKeys.escape.onDown(close)
-        YippyHotKeys.return.onDown(pasteSelected)
         YippyHotKeys.ctrlAltCmdLeftArrow.onDown { State.main.panelPosition.accept(.left) }
         YippyHotKeys.ctrlAltCmdRightArrow.onDown { State.main.panelPosition.accept(.right) }
         YippyHotKeys.ctrlAltCmdDownArrow.onDown { State.main.panelPosition.accept(.bottom) }
@@ -101,7 +101,6 @@ class YippyViewController: NSViewController {
         
         bindHotKeyToYippyWindow(YippyHotKeys.downArrow, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.upArrow, disposeBag: disposeBag)
-        bindHotKeyToYippyWindow(YippyHotKeys.return, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.escape, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.pageDown, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.pageUp, disposeBag: disposeBag)
@@ -121,10 +120,11 @@ class YippyViewController: NSViewController {
         bindHotKeyToYippyWindow(YippyHotKeys.cmd9, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.ctrlDelete, disposeBag: disposeBag)
         bindHotKeyToYippyWindow(YippyHotKeys.ctrlSpace, disposeBag: disposeBag)
+        localReturnKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: handleLocalKeyDown)
         
         searchBar.resignFirstResponder()
     }
-    
+
     override func viewWillAppear() {
         super.viewWillAppear()
         
@@ -216,9 +216,24 @@ class YippyViewController: NSViewController {
     }
     
     func pasteSelected() {
-        if let selected = self.yippyHistoryView.selected {
+        if let selected = self.yippyHistoryView.selected ?? self.selected.value,
+           selected < self.yippyHistory.items.count {
             paste(selected: selected)
         }
+    }
+
+    private func handleLocalKeyDown(_ event: NSEvent) -> NSEvent? {
+        guard State.main.isHistoryPanelShown.value else {
+            return event
+        }
+
+        let modifiers = event.modifierFlags.intersection(.recommended)
+        guard event.keyCode == Key.return.carbonKeyCode && modifiers.isEmpty else {
+            return event
+        }
+
+        pasteSelected()
+        return nil
     }
     
     func deleteSelected() {
@@ -294,7 +309,7 @@ class YippyViewController: NSViewController {
             selected.accept(s - 1)
         }
     }
-    
+
     private func paste(selected: Int) {
         self.close()
         yippyHistory.paste(selected: selected)

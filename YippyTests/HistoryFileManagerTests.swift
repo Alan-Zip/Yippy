@@ -64,6 +64,7 @@ class HistoryFileManagerTests: XCTestCase {
     
     // MARK: - saveHistoryOrder()
     
+    @MainActor
     func testSaveHistoryOrderSuccess() {
         // 1. Setup mock to succeed in reading the file.
         orderManager.shouldReadSucceed = true
@@ -84,12 +85,12 @@ class HistoryFileManagerTests: XCTestCase {
         }
         
         // 3. Assert that the last history order is the history order.
-        waitForExpectations(timeout: 2, handler: { _ in
-            let order = self.historyFM.loadHistoryOrder()
-            XCTAssertEqual(order, self.history2.map({$0.fsId}))
-        })
+        waitForExpectations(timeout: 2)
+        let order = historyFM.loadHistoryOrder()
+        XCTAssertEqual(order, history2.map({$0.fsId}))
     }
     
+    @MainActor
     func testSaveHistoryOrderFailure() {
         // 1. Setup mock to succeed in reading the file.
         orderManager.shouldWriteSucceed = false
@@ -114,6 +115,7 @@ class HistoryFileManagerTests: XCTestCase {
     
     // MARK: - loadHistoryOrder()
     
+    @MainActor
     func testLoadHistoryOrderSuccess() {
         // 1. Setup mock to return a valid list
         let uuidStrings = ["5FEA8AD4-390E-4988-8635-EBB08F79CDC1"]
@@ -127,6 +129,7 @@ class HistoryFileManagerTests: XCTestCase {
         XCTAssertEqual(uuids!.map({$0.uuidString}), uuidStrings)
     }
     
+    @MainActor
     func testLoadHistoryOrderFailure() {
         // 1. Setup mock to return nil
         orderManager.shouldReadSucceed = false
@@ -141,6 +144,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testLoadHistoryOrderInvalidStrings() {
         // 1. Setup mock to return half valid list
         let uuidStrings = ["Garbage", "5FEA8AD4-390E-4988-8635-EBB08F79CDC1", "Fluff"]
@@ -161,6 +165,7 @@ class HistoryFileManagerTests: XCTestCase {
     }
     
     // MARK: - loadData()
+    @MainActor
     func testLoadDataWhenSuccessful() {
         // 1. Setup mock to return some data
         let testData = Data(base64Encoded: "Blah")
@@ -175,6 +180,7 @@ class HistoryFileManagerTests: XCTestCase {
         XCTAssertEqual(data, testData)
     }
     
+    @MainActor
     func testLoadDataWhenUnsuccessful() {
         // 1. Setup mock to not return some data
         let item = history2[0]
@@ -194,6 +200,7 @@ class HistoryFileManagerTests: XCTestCase {
     
     
     // MARK: - loadHistory()
+    @MainActor
     func testLoadHistoryWhenOrderNil() {
         // 1. Setup mock to return nil
         orderManager.shouldReadSucceed = false
@@ -207,7 +214,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. There should be an error logged
-        history.subscribe(onNext: { items in
+        history.subscribe(onNext: { items, _ in
             if items.count == 0 {
                 noItems.fulfill()
             }
@@ -215,6 +222,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testLoadHistoryWhenFailsToGetHistoryContents() {
         // 1. Setup mock to error at history contents
         orderManager.order = [UUID().uuidString] as NSArray
@@ -231,7 +239,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. There should be a history with no items
-        history.subscribe(onNext: { items in
+        history.subscribe(onNext: { items, _ in
             if items.count == 0 {
                 noItems.fulfill()
             }
@@ -239,6 +247,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testLoadHistoryWhenHistoryContentsContainsNonUUID() {
         // 1. Setup mock to have a folder in history contents with a non uuid name
         orderManager.order = history2.map({$0.fsId.uuidString}) as NSArray
@@ -262,7 +271,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. Should contain 2 items and warnings and errors should have happened
-        history.subscribe { items in
+        history.subscribe { items, _ in
             if items.count == 2 {
                 itemsExp.fulfill()
             }
@@ -270,6 +279,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 2)
     }
     
+    @MainActor
     func testLoadHistoryWhenItemContentsFails() {
         // 1. Setup mock to fail with one of the items
         orderManager.order = history2.map({$0.fsId.uuidString}) as NSArray
@@ -296,7 +306,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. Should contain 2 items and errors should have happened
-        history.subscribe { items in
+        history.subscribe { items, _ in
             if items.count == 2 && !items.contains(where: {$0.fsId == self.history2[1].fsId}) {
                 itemsExp.fulfill()
             }
@@ -304,6 +314,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 2)
     }
     
+    @MainActor
     func testLoadHistoryWhenItemNotInOrder() {
         // 1. Setup mock to fail with one of the items
         orderManager.order = history2.map({$0.fsId.uuidString}) as NSArray
@@ -329,7 +340,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. Should contain 2 items and errors should have happened
-        history.subscribe { items in
+        history.subscribe { items, _ in
             if items.count == 4 && items[0].fsId == storedHistory[3].fsId {
                 itemsExp.fulfill()
             }
@@ -337,6 +348,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 2)
     }
     
+    @MainActor
     func testLoadHistoryWhenItemInOrderMissing() {
         // 1. Setup mock to fail with one of the items
         orderManager.order = history2.map({$0.fsId.uuidString}) as NSArray
@@ -360,7 +372,7 @@ class HistoryFileManagerTests: XCTestCase {
         let history = historyFM.loadHistory(cache: cache)
         
         // 3. Should contain 2 items and errors should have happened
-        history.subscribe { items in
+        history.subscribe { items, _ in
             if items.count == 2 && !items.contains(where: {$0.fsId == self.history2[1].fsId}) {
                 itemsExp.fulfill()
             }
@@ -369,6 +381,7 @@ class HistoryFileManagerTests: XCTestCase {
     }
     
     // MARK: - insertItem()
+    @MainActor
     func testInsertItemWhenUnsavedDataNil() {
         // 1. Setup item
         let item = HistoryItem(fsId: UUID(), types: [.string], cache: cache)
@@ -385,6 +398,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testInsertItemWhenFailsToCreateNewDirectory() {
         // 1. Setup to fail inserting item into history2 at 0
         fileManager.createDirectory[historyFM.getUrl(forItemWithId: history2[0].fsId)] = false
@@ -402,6 +416,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testInsertItemWhenFailsToWriteData() {
         let history = [
             HistoryItem(unsavedData: [.string: "Test".data(using: .utf8)!], cache: cache)
@@ -423,6 +438,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testInsertItemSuccessful() {
         let history = [
             HistoryItem(unsavedData: [.string: "Test".data(using: .utf8)!], cache: cache)
@@ -441,14 +457,14 @@ class HistoryFileManagerTests: XCTestCase {
         }
         
         // 3. Wait for success, no more unsaved data and should be caching
-        waitForExpectations(timeout: 1, handler: { _ in
-            XCTAssertNil(history[0].unsavedData)
-            XCTAssertTrue(self.cache.isItemRegistered(history[0].fsId))
-        })
+        waitForExpectations(timeout: 1)
+        XCTAssertNil(history[0].unsavedData)
+        XCTAssertTrue(cache.isItemRegistered(history[0].fsId))
     }
     
     
     // MARK: - deleteItem()
+    @MainActor
     func testDeleteItemWhenDeleteFolderFails() {
         // 1. Setup the mock to fail
         let deleted = HistoryItem(fsId: UUID(), types: [], cache: cache)
@@ -471,6 +487,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testDeleteItemSuccess() {
         // 1. Setup the mock to succeed
         let deleted = HistoryItem(fsId: UUID(), types: [], cache: cache)
@@ -486,13 +503,13 @@ class HistoryFileManagerTests: XCTestCase {
         }
         
         // 3. Wait for errors
-        waitForExpectations(timeout: 1) { _ in
-            XCTAssertFalse(self.cache.isItemRegistered(deleted.fsId))
-        }
+        waitForExpectations(timeout: 1)
+        XCTAssertFalse(cache.isItemRegistered(deleted.fsId))
     }
     
     
     // MARK: - moveItem()
+    @MainActor
     func testWhenMoveItemNewOrderSaved() {
         // 1. Set original order to history2
         let originalOrder = history2.map({$0.fsId.uuidString})
@@ -512,13 +529,13 @@ class HistoryFileManagerTests: XCTestCase {
         }
         
         // 3. Assert that the new history order has been saved.
-        waitForExpectations(timeout: 2, handler: { _ in
-            XCTAssertEqual(self.historyFM.loadHistoryOrder()!.map({$0.uuidString}), newOrder)
-        })
+        waitForExpectations(timeout: 2)
+        XCTAssertEqual(historyFM.loadHistoryOrder()!.map({$0.uuidString}), newOrder)
     }
     
     
     // MARK: - clearHistory()
+    @MainActor
     func testClearHistoryWhenRemoveOldHistoryFails() {
         // 1. Setup mock to fail
         fileManager.removeItem[Constants.urls.history] = false
@@ -540,6 +557,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testClearHistoryWhenCreateNewHistoryFails() {
         // 1. Setup mock to fail
         fileManager.removeItem[Constants.urls.history] = true
@@ -562,6 +580,7 @@ class HistoryFileManagerTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
+    @MainActor
     func testClearHistorySuccessful() {
         // 1. Setup mock to succeed
         fileManager.removeItem[Constants.urls.history] = true
@@ -582,6 +601,7 @@ class HistoryFileManagerTests: XCTestCase {
     
         
     // MARK: - getUrl() - Item
+    @MainActor
     func testGetUrlForItemReturnsCorrectUrl() {
         // 1. Create an id
         let id = UUID()
@@ -598,6 +618,7 @@ class HistoryFileManagerTests: XCTestCase {
     
     
     // MARK: - getUrl() - Data
+    @MainActor
     func testGetUrlForItemDataReturnsCorrectUrl() {
         // 1. Create an id and pasteboard type
         let id = UUID()

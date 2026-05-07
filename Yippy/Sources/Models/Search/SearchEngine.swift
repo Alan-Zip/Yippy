@@ -22,7 +22,7 @@ struct SearchQuery: Hashable, Equatable {
     }
 }
 
-public class SearchResult {
+public class SearchResult: @unchecked Sendable {
     
     var query: SearchQuery
     var results: [Int] = []
@@ -49,13 +49,23 @@ public class SearchResult {
     }
 }
 
-public class SearchEngine {
+private struct SearchCompletion: @unchecked Sendable {
+    let handler: (SearchResult) -> Void
+
+    func callAsFunction(_ result: SearchResult) {
+        handler(result)
+    }
+}
+
+public class SearchEngine: @unchecked Sendable {
     
     var results = [SearchQuery: SearchResult]()
     
     var inProgress = [SearchQuery]()
     
-    var sem = DispatchSemaphore(value: 1)
+    private let stateQueue = DispatchQueue(label: "SearchEngine.state", qos: .userInitiated)
+
+    private let searchQueue = DispatchQueue(label: "SearchEngine.search", qos: .userInitiated, attributes: .concurrent)
     
     var data: [String]
     
@@ -65,56 +75,43 @@ public class SearchEngine {
     
     public func search(query: String, completion: @escaping (SearchResult) -> Void) {
         let searchQuery = SearchQuery.fromRawText(query)
+        let completionHandler = SearchCompletion(handler: completion)
         
         if let result = findResult(forQuery: searchQuery) {
             return completion(result)
         }
         
-        DispatchQueue.global().async {
-            self.sem.wait()
+        stateQueue.async {
             self.inProgress.append(searchQuery)
-            self.sem.signal()
+        }
+
+        let data = self.data
+        searchQueue.async {
+            let searchResult = SearchResult(query: searchQuery, items: data.count)
             
-            // Do something
-            let resSem = DispatchSemaphore(value: 1)
-            let searchResult = SearchResult(query: searchQuery, items: self.data.count)
-            for (i, d) in self.data.enumerated() {
-                DispatchQueue.global().async {
-                    if performSearch(needle: searchQuery.query, haystack: d) {
-                        resSem.wait()
-                        searchResult.addResult(i)
-                        resSem.signal()
-                    }
-                    else {
-                        resSem.wait()
-                        searchResult.recordFailure()
-                        resSem.signal()
-                    }
+            for (i, d) in data.enumerated() {
+                if performSearch(needle: searchQuery.query, haystack: d) {
+                    searchResult.addResult(i)
+                }
+                else {
+                    searchResult.recordFailure()
                 }
             }
             
-            self.finishSearch(searchResult: searchResult, update: completion) {
-                self.sem.wait()
+            self.stateQueue.async {
                 self.inProgress.removeAll(where: {$0 == searchQuery})
                 self.results[searchQuery] = searchResult
-                self.sem.signal()
+
+                DispatchQueue.main.async {
+                    completionHandler(searchResult)
+                }
             }
         }
     }
     
-    private func finishSearch(searchResult: SearchResult, update: @escaping (SearchResult) -> (), completion: @escaping () -> ()) {
-        if searchResult.isFinished {
-            update(searchResult)
-            completion()
-            return
-        }
-        
-        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + 0.1, execute: {
-            self.finishSearch(searchResult: searchResult, update: update, completion: completion)
-        })
-    }
-    
     private func findResult(forQuery query: SearchQuery) -> SearchResult? {
-        return results[query]
+        return stateQueue.sync {
+            return results[query]
+        }
     }
 }
