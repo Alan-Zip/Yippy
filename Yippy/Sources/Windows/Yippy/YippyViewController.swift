@@ -160,7 +160,11 @@ class YippyViewController: NSViewController {
     }
     
     func updateSearchEngine(items: [HistoryItem]) {
-        self.searchEngine = SearchEngine(data: items.compactMap({$0.getPlainString()}))
+        let searchableItems = items.enumerated().compactMap { index, item -> SearchDocument? in
+            guard let plainString = item.getPlainString() else { return nil }
+            return SearchDocument(index: index, text: plainString)
+        }
+        self.searchEngine = SearchEngine(indexedData: searchableItems)
     }
     
     func onAllChange(_ results: Results, _ selected: (Int?, Int?)) {
@@ -272,6 +276,8 @@ class YippyViewController: NSViewController {
     
     func runSearch() {
         searchEngine.search(query: searchBar.stringValue, completion: { result in
+            guard result.query == SearchQuery.fromRawText(self.searchBar.stringValue) else { return }
+
             if (result.query.query.isEmpty) {
                 self.results.accept(Results(items: State.main.history.items, isSearchResult: false))
                 return

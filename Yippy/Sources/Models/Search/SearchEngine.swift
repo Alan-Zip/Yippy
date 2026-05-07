@@ -8,18 +8,43 @@
 
 import Foundation
 
-struct SearchQuery: Hashable, Equatable {
+struct SearchQuery: Hashable, Equatable, Sendable {
     
     var query: String
+    let searchableText: SearchableText
     
-    // Enfore the data invariant
+    // Enforce the data invariant
     private init(query: String) {
         self.query = query
+        self.searchableText = SearchableText(query)
     }
     
     static func fromRawText(_ str: String) -> SearchQuery {
-        return SearchQuery(query: str)
+        return SearchQuery(query: SearchableText(str).normalized)
     }
+
+    static func == (lhs: SearchQuery, rhs: SearchQuery) -> Bool {
+        return lhs.query == rhs.query
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(query)
+    }
+}
+
+struct SearchDocument: Sendable {
+    let index: Int
+    let searchableText: SearchableText
+
+    init(index: Int, text: String) {
+        self.index = index
+        self.searchableText = SearchableText(text)
+    }
+}
+
+private struct SearchMatch {
+    let index: Int
+    let score: Int
 }
 
 public class SearchResult: @unchecked Sendable {
@@ -40,12 +65,16 @@ public class SearchResult: @unchecked Sendable {
     
     func addResult(_ i: Int) {
         results.append(i)
-        results.sort()
         completed += 1
     }
     
     func recordFailure() {
         completed += 1
+    }
+
+    func finish(with results: [Int]) {
+        self.results = results
+        self.completed = items
     }
 }
 
@@ -67,10 +96,16 @@ public class SearchEngine: @unchecked Sendable {
 
     private let searchQueue = DispatchQueue(label: "SearchEngine.search", qos: .userInitiated, attributes: .concurrent)
     
-    var data: [String]
+    let documents: [SearchDocument]
     
     init(data: [String]) {
-        self.data = data
+        self.documents = data.enumerated().map { index, text in
+            SearchDocument(index: index, text: text)
+        }
+    }
+
+    init(indexedData: [SearchDocument]) {
+        self.documents = indexedData
     }
     
     public func search(query: String, completion: @escaping (SearchResult) -> Void) {
@@ -85,18 +120,32 @@ public class SearchEngine: @unchecked Sendable {
             self.inProgress.append(searchQuery)
         }
 
-        let data = self.data
+        let documents = self.documents
         searchQueue.async {
-            let searchResult = SearchResult(query: searchQuery, items: data.count)
+            let searchResult = SearchResult(query: searchQuery, items: documents.count)
+            var matches = [SearchMatch]()
             
-            for (i, d) in data.enumerated() {
-                if performSearch(needle: searchQuery.query, haystack: d) {
-                    searchResult.addResult(i)
+            for document in documents {
+                if searchQuery.query.isEmpty {
+                    matches.append(SearchMatch(index: document.index, score: 0))
+                }
+                else if let score = SearchScorer.score(query: searchQuery.searchableText, candidate: document.searchableText) {
+                    matches.append(SearchMatch(index: document.index, score: score))
                 }
                 else {
                     searchResult.recordFailure()
                 }
             }
+
+            let orderedResults = matches
+                .sorted { lhs, rhs in
+                    if lhs.score == rhs.score {
+                        return lhs.index < rhs.index
+                    }
+                    return lhs.score > rhs.score
+                }
+                .map(\.index)
+            searchResult.finish(with: orderedResults)
             
             self.stateQueue.async {
                 self.inProgress.removeAll(where: {$0 == searchQuery})
