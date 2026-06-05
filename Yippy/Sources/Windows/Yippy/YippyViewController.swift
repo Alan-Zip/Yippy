@@ -41,6 +41,7 @@ class YippyViewController: NSViewController {
     let results = BehaviorRelay(value: Results(items: [], isSearchResult: false))
     let selected = BehaviorRelay<Int?>(value: nil)
     private var localReturnKeyMonitor: Any?
+    private let restoreButton = NSButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +66,7 @@ class YippyViewController: NSViewController {
             .disposed(by: disposeBag)
         
         searchBar.delegate = self
+        setupRestoreButton()
         
         // TODO: Fix hack to make onAllChange run initially
         selected.accept(1)
@@ -142,6 +144,7 @@ class YippyViewController: NSViewController {
     }
     
     func onHistoryChange(_ history: [HistoryItem], change: History.Change) {
+        updateRestoreButton()
         updateSearchEngine(items: history)
         if !searchBar.stringValue.isEmpty {
             runSearch()
@@ -243,7 +246,20 @@ class YippyViewController: NSViewController {
     func deleteSelected() {
         if let selected = self.yippyHistoryView.selected {
             self.selected.accept(yippyHistory.delete(selected: selected))
+            updateRestoreButton()
         }
+    }
+
+    @objc func restoreDeletedItem() {
+        guard yippyHistory.history.hasRestorableDeletedItems else {
+            return
+        }
+
+        searchBar.stringValue = ""
+        if let restoredIndex = yippyHistory.history.restoreLastDeletedItem() {
+            selected.accept(restoredIndex)
+        }
+        updateRestoreButton()
     }
     
     func close() {
@@ -319,6 +335,63 @@ class YippyViewController: NSViewController {
     private func paste(selected: Int) {
         self.close()
         yippyHistory.paste(selected: selected)
+    }
+
+    private func setupRestoreButton() {
+        guard let container = searchBar.superview else {
+            return
+        }
+
+        restoreButton.translatesAutoresizingMaskIntoConstraints = false
+        restoreButton.title = ""
+        restoreButton.image = NSImage(systemSymbolName: "arrow.uturn.backward", accessibilityDescription: "Restore deleted item")
+        restoreButton.imagePosition = .imageOnly
+        restoreButton.imageScaling = .scaleProportionallyDown
+        restoreButton.bezelStyle = .rounded
+        restoreButton.setButtonType(.momentaryPushIn)
+        restoreButton.target = self
+        restoreButton.action = #selector(restoreDeletedItem)
+        restoreButton.toolTip = "Restore deleted item"
+        restoreButton.setAccessibilityIdentifier(Accessibility.identifiers.restoreDeletedItemButton)
+        restoreButton.setAccessibilityLabel("Restore deleted item")
+
+        container.addSubview(restoreButton)
+        deactivateSearchBarTrailingConstraint(in: container)
+
+        NSLayoutConstraint.activate([
+            restoreButton.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
+            restoreButton.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -20),
+            restoreButton.widthAnchor.constraint(equalToConstant: 28),
+            restoreButton.heightAnchor.constraint(equalToConstant: 28),
+            searchBar.trailingAnchor.constraint(equalTo: restoreButton.leadingAnchor, constant: -8),
+        ])
+
+        updateRestoreButton()
+    }
+
+    private func deactivateSearchBarTrailingConstraint(in container: NSView) {
+        for constraint in container.constraints {
+            let firstItem = constraint.firstItem as AnyObject?
+            let secondItem = constraint.secondItem as AnyObject?
+            let touchesSearchTrailing = (
+                firstItem === searchBar && constraint.firstAttribute == .trailing
+            ) || (
+                secondItem === searchBar && constraint.secondAttribute == .trailing
+            )
+            let touchesContainerTrailing = (
+                firstItem === container && constraint.firstAttribute == .trailing
+            ) || (
+                secondItem === container && constraint.secondAttribute == .trailing
+            )
+
+            if touchesSearchTrailing && touchesContainerTrailing {
+                constraint.isActive = false
+            }
+        }
+    }
+
+    private func updateRestoreButton() {
+        restoreButton.isEnabled = yippyHistory.history.hasRestorableDeletedItems
     }
 }
 

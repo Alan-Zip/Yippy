@@ -39,6 +39,7 @@ class Accessibility {
         static let howToUseLabel = "howToUseLabel"
         
         static let yippyTableView = "yippyTableView"
+        static let restoreDeletedItemButton = "restoreDeletedItemButton"
         static let yippyItemTextView = "YippyItemTextView"
         static let yippyTextCellView = "YippyTextCellView"
         static let yippyColorCellView = "YippyColorCellView"

@@ -83,6 +83,8 @@ struct Constants {
     struct system {
         
         static let maxHistoryItems = 5000
+
+        static let maxRestorableHistoryItems = 5
     }
     
     struct settings {

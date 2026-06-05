@@ -13,8 +13,15 @@ import RxRelay
 
 /// Representation of all the history
 class History {
+
+    private struct RestorableItem {
+        let item: HistoryItem
+        let originalIndex: Int
+    }
     
     private var _items = [HistoryItem]()
+
+    private var restorableItems = [RestorableItem]()
     
     /// Behaviour relay for the last change count of the pasteboard.
     /// Private so that it cannot be manipulated outside of the class.
@@ -42,6 +49,10 @@ class History {
         get {
             return self._items
         }
+    }
+
+    var hasRestorableDeletedItems: Bool {
+        return !restorableItems.isEmpty
     }
     
     var maxItems: Observable<Int> {
@@ -111,8 +122,22 @@ class History {
     
     func deleteItem(at i: Int) {
         let removed = _items.remove(at: i)
+        storeRestorableCopy(of: removed, originalIndex: i)
         subscribers.forEach({$0(_items, Change.delete(deletedItem: removed))})
         historyFM.deleteItem(newHistory: _items, deleted: removed)
+    }
+
+    func restoreLastDeletedItem() -> Int? {
+        guard !restorableItems.isEmpty else {
+            return nil
+        }
+
+        let restorable = restorableItems.removeFirst()
+        let insertIndex = min(restorable.originalIndex, _items.count)
+        _items.insert(restorable.item, at: insertIndex)
+        subscribers.forEach({$0(_items, Change.insert(index: insertIndex))})
+        historyFM.insertItem(newHistory: _items, at: insertIndex)
+        return insertIndex
     }
     
     func clear() {
@@ -148,6 +173,27 @@ class History {
         let deletedItems = Array(_items.suffix(_items.count - maxItems))
         _items = Array(_items.prefix(maxItems))
         subscribers.forEach({$0(_items, Change.itemLimitDecreased(deletedItems: deletedItems))})
+    }
+
+    private func storeRestorableCopy(of item: HistoryItem, originalIndex: Int) {
+        var data = [NSPasteboard.PasteboardType: Data]()
+
+        for type in item.types {
+            if let itemData = item.data(forType: type) {
+                data[type] = itemData
+            }
+        }
+
+        guard !data.isEmpty else {
+            return
+        }
+
+        let restorableItem = HistoryItem(unsavedData: data, cache: cache)
+        restorableItems.insert(RestorableItem(item: restorableItem, originalIndex: originalIndex), at: 0)
+
+        if restorableItems.count > Constants.system.maxRestorableHistoryItems {
+            restorableItems.removeLast(restorableItems.count - Constants.system.maxRestorableHistoryItems)
+        }
     }
 }
 

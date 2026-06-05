@@ -61,8 +61,13 @@ class YippyHistory {
     
     /// Returns the next item to select
     func delete(selected: Int) -> Int? {
-        history.deleteItem(at: selected)
-        if selected == 0 {
+        guard items.indices.contains(selected),
+              let historyIndex = history.items.firstIndex(where: { $0.fsId == items[selected].fsId }) else {
+            return nil
+        }
+
+        history.deleteItem(at: historyIndex)
+        if historyIndex == 0 {
             // If we want to remove this, then we may have to change the `HistoryItem` writingOptions() to not `.promised`, because if something is pasted from history, then deleted, it can no longer satisfy the promise.
             pasteboard.clearContents()
         }
